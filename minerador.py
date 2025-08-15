@@ -77,3 +77,65 @@ def load_existing_data():
             return json.load(f)
     return []
 
+def save_data(all_repos_data):
+    """salva CSV e JSON incrementalmente no mesmo arquivo."""
+    # atualiza CSV completo
+    pd.DataFrame(all_repos_data).to_csv(CSV_FILE, index=False)
+    
+    # salva JSON completo
+    with open(JSON_FILE, 'w', encoding='utf-8') as f:
+        json.dump(all_repos_data, f, ensure_ascii=False, indent=2)
+
+def mine_repositories():
+    all_repos_data = load_existing_data()
+    cursor = None
+
+    print(f"iniciando mineração...\n")
+
+    while len(all_repos_data) < TOTAL_REPOS:
+        variables = {"cursor": cursor}
+        result = run_query(GRAPHQL_QUERY, variables)
+        data = result['data']['search']
+        repos = data['nodes']
+
+        if not repos:
+            print("nenhum repositório retornado, saindo...")
+            break
+
+        for repo in repos:
+            primary_language_name = repo['primaryLanguage']['name'] if repo['primaryLanguage'] else 'N/A'
+            repo_data = {
+                'name': repo['nameWithOwner'],
+                'stars': repo['stargazers']['totalCount'],
+                'createdAt': repo['createdAt'],
+                'pushedAt': repo['pushedAt'],
+                'primaryLanguage': primary_language_name,
+                'totalReleases': repo['releases']['totalCount'],
+                'acceptedPullRequests': repo['pullRequests']['totalCount'],
+                'totalIssues': repo['issues']['totalCount'],
+                'closedIssues': repo['closedIssues']['totalCount'],
+            }
+            all_repos_data.append(repo_data)
+
+        # limita a quantidade total
+        if len(all_repos_data) > TOTAL_REPOS:
+            all_repos_data = all_repos_data[:TOTAL_REPOS]
+
+        # salva CSV + JSON incremental
+        save_data(all_repos_data)
+        print(f"coletados {len(all_repos_data)}/{TOTAL_REPOS} repositórios...\n")
+
+        page_info = data['pageInfo']
+        if not page_info['hasNextPage']:
+            print("não há mais páginas para buscar.")
+            break
+
+        cursor = page_info['endCursor']
+        time.sleep(5)  # pausa entre páginas
+
+    print("mineração concluída!")
+    print(f"arquivos finais salvos em '{CSV_FILE}' e '{JSON_FILE}'")
+    return pd.DataFrame(all_repos_data)
+
+if __name__ == "__main__":
+    mine_repositories()
