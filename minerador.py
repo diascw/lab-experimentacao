@@ -14,9 +14,9 @@ if not GITHUB_TOKEN:
 API_URL = "https://api.github.com/graphql"
 HEADERS = {"Authorization": f"bearer {GITHUB_TOKEN}"}
 
-TOTAL_REPOS = 100
-BATCH_SIZE = 3  # menor batch para evitar 502 e Response ended prematurely
-CSV_FILE = "top_100_github_repos.csv"
+TOTAL_REPOS = 1000        # agora 1000 repositórios
+BATCH_SIZE = 4         # máximo permitido pela API
+CSV_FILE = "top_1000_github_repos.csv"
 JSON_FILE = "laboratorio-01_data.json"
 
 GRAPHQL_QUERY = """
@@ -131,11 +131,12 @@ def mine_repositories():
             break
 
         cursor = page_info['endCursor']
-        time.sleep(5)  # pausa entre páginas
+        time.sleep(2)  # pausa leve para não sobrecarregar a API
 
     print("mineração concluída!")
     print(f"arquivos finais salvos em '{CSV_FILE}' e '{JSON_FILE}'")
     return pd.DataFrame(all_repos_data)
 
 if __name__ == "__main__":
-    mine_repositories()
+    df = mine_repositories()
+    print(df.head())
