@@ -59,7 +59,7 @@ A seguir, cada hipótese é confrontada com os dados analisados.
 <br>
 <div align="center">
 
-| ![Gráfico da distribuição de pull requests aceitas.](graficos/rq02_pull_requests.png) |
+| ![Gráfico da distribuição de pull requests aceitas.](../graficos/rq02_pull_requests.png) |
 |:---:|
 | **Figura 2:** Distribuição de Pull Requests Aceitas. O box plot em escala logarítmica mostra uma mediana elevada e a presença de projetos com altíssimo engajamento. |
 
@@ -74,7 +74,7 @@ A seguir, cada hipótese é confrontada com os dados analisados.
 <br>
 <div align="center">
 
-| ![Gráfico da distribuição do total de releases.](graficos/rq03_releases.png) |
+| ![Gráfico da distribuição do total de releases.](../graficos/rq03_releases.png) |
 |:---:|
 | **Figura 3:** Distribuição do Total de Releases. O gráfico mostra que a maioria dos repositórios que utilizam releases possui menos de 200 versões publicadas. |
 
@@ -89,7 +89,7 @@ A seguir, cada hipótese é confrontada com os dados analisados.
 <br>
 <div align="center">
 
-| ![Gráfico da frequência de atualizações.](graficos/rq04_atualizacao.png) |
+| ![Gráfico da frequência de atualizações.](../graficos/rq04_atualizacao.png) |
 |:---:|
 | **Figura 4:** Frequência de Atualizações (Dias desde o último push). O histograma mostra uma forte concentração de projetos atualizados em menos de 100 dias. |
 
@@ -104,7 +104,7 @@ A seguir, cada hipótese é confrontada com os dados analisados.
 <br>
 <div align="center">
 
-| ![Gráfico de pizza com a distribuição das linguagens de programação.](graficos/rq05_linguagens.png) |
+| ![Gráfico de pizza com a distribuição das linguagens de programação.](../graficos/rq05_linguagens.png) |
 |:---:|
 | **Figura 5:** Distribuição das 10 Principais Linguagens de Programação. Python, TypeScript e JavaScript dominam, confirmando sua popularidade no ecossistema open-source. |
 
@@ -119,7 +119,7 @@ A seguir, cada hipótese é confrontada com os dados analisados.
 <br>
 <div align="center">
 
-| ![Gráfico da distribuição do percentual de issues fechadas.](graficos/rq06_issues_fechadas.png) |
+| ![Gráfico da distribuição do percentual de issues fechadas.](../graficos/rq06_issues_fechadas.png) |
 |:---:|
 | **Figura 6:** Distribuição do Percentual de Issues Fechadas. O histograma mostra que a grande maioria dos repositórios resolve mais de 80% das issues abertas. |
 
@@ -136,7 +136,7 @@ Ao analisar as métricas por linguagem, observamos padrões interessantes:
 <br>
 <div align="center">
 
-| ![Gráfico de calor com métricas normalizadas por linguagem.](graficos/rq07_metricas_por_linguagem.png) |
+| ![Gráfico de calor com métricas normalizadas por linguagem.](../graficos/rq07_metricas_por_linguagem.png) |
 |:---:|
 | **Figura 7:** Métricas Normalizadas por Linguagem. O heatmap compara a performance mediana de cada linguagem, revelando os pontos fortes de cada ecossistema. |
 
