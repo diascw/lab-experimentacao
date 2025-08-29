@@ -44,7 +44,7 @@ A seguir, cada hipótese é confrontada com os dados analisados.
 <br>
 <div align="center">
 
-| ![Gráfico da distribuição de idade dos repositórios.](graficos/rq01_idade_repositorios.png) |
+| ![Gráfico da distribuição de idade dos repositórios.](../graficos/rq01_idade_repositorios.png) |
 |:---:|
 | **Figura 1:** Distribuição da Idade dos Repositórios (em anos). A maioria concentra-se na faixa de 8 a 12 anos, indicando que a maturidade é um fator comum entre projetos populares. |
 
