@@ -1,165 +1,136 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
+import os
 
 # --- 1. Carregamento e Preparação dos Dados ---
 print("Carregando e preparando os dados...")
 CSV_FILE = 'top_1000_github_repos.csv'
 df = pd.read_csv(CSV_FILE)
 
-# Converte colunas de data para o formato datetime
+# Converte colunas de data
 df['createdAt'] = pd.to_datetime(df['createdAt'])
 df['pushedAt'] = pd.to_datetime(df['pushedAt'])
 
-# Calcula a idade do repositório em anos
+# Calcula métricas derivadas
 df['repositoryAge'] = (pd.to_datetime('now', utc=True) - df['createdAt']).dt.days / 365.25
-
-# Calcula os dias desde a última atualização
 df['daysSinceLastPush'] = (pd.to_datetime('now', utc=True) - df['pushedAt']).dt.days
-
-# Calcula o percentual de issues fechadas, tratando divisão por zero
 df['closedIssuesPercentage'] = (df['closedIssues'] / df['totalIssues'] * 100).fillna(100)
 
-print("Dados carregados e novas métricas calculadas com sucesso!")
+print("Dados carregados e preparados!")
 
-# Cria um diretório para salvar os gráficos
-import os
-if not os.path.exists('graficos'):
-    os.makedirs('graficos')
+# Cria um diretório para salvar os gráficos (usando o mesmo nome 'graficos')
+OUTPUT_DIR = 'graficos'
+if not os.path.exists(OUTPUT_DIR):
+    os.makedirs(OUTPUT_DIR)
 
-# --- 2. Geração dos Gráficos ---
+# --- Função para salvar tabelas como imagem ---
+def save_df_as_image(df, title, filepath):
+    """ Salva um DataFrame do Pandas como uma imagem de tabela. """
+    fig, ax = plt.subplots(figsize=(8, max(2, len(df) * 0.5))) # Ajusta o tamanho dinamicamente
+    ax.axis('off')
+    ax.axis('tight')
+    
+    # Formata os números no DataFrame para melhor leitura
+    df_display = df.copy()
+    for col in df_display.select_dtypes(include=np.number).columns:
+        df_display[col] = df_display[col].apply(lambda x: f'{x:,.2f}' if isinstance(x, float) else f'{x:,}')
 
-# RQ01: Idade dos Repositórios (Histograma)
+    table = ax.table(cellText=df_display.values, colLabels=df_display.columns, rowLabels=df_display.index, cellLoc='center', loc='center')
+    table.auto_set_font_size(False)
+    table.set_fontsize(10)
+    table.scale(1.2, 1.2)
+    
+    plt.title(title, fontsize=14, pad=20)
+    plt.tight_layout()
+    plt.savefig(filepath, bbox_inches='tight', dpi=200)
+    plt.close()
+
+# --- 2. Geração dos Gráficos e Tabelas ---
+
+# RQ01: Idade dos Repositórios (Gráfico de Pizza)
 print("Gerando gráfico para RQ01 - Idade dos Repositórios...")
-plt.figure(figsize=(10, 6))
-sns.histplot(df['repositoryAge'], bins=20, kde=True)
-plt.title('RQ01: Distribuição da Idade dos Repositórios Populares (em anos)')
-plt.xlabel('Idade (Anos)')
-plt.ylabel('Número de Repositórios')
-plt.grid(True)
-plt.savefig('graficos/rq01_idade_repositorios.png')
+bins = [0, 5, 8, 10, 12, df['repositoryAge'].max()]
+labels = ['0-5 anos', '5-8 anos', '8-10 anos', '10-12 anos', '12+ anos']
+df['age_group'] = pd.cut(df['repositoryAge'], bins=bins, labels=labels, right=False)
+age_dist = df['age_group'].value_counts()
+
+plt.figure(figsize=(10, 8))
+plt.pie(age_dist, labels=age_dist.index, autopct='%1.1f%%', startangle=140)
+plt.title('RQ01: Proporção de Repositórios por Faixa de Idade')
+plt.axis('equal')
+plt.savefig(os.path.join(OUTPUT_DIR, 'rq01_idade_pizza.png'))
 plt.close()
 
-# RQ02: Pull Requests Aceitas (Box Plot)
-print("Gerando gráfico para RQ02 - Pull Requests...")
-plt.figure(figsize=(10, 6))
-# Usando escala de log para melhor visualização devido a outliers
-sns.boxplot(x=df['acceptedPullRequests'])
-plt.xscale('log')
-plt.title('RQ02: Distribuição de Pull Requests Aceitas (Escala Log)')
-plt.xlabel('Número de Pull Requests Aceitas')
-plt.grid(True)
-plt.savefig('graficos/rq02_pull_requests.png')
-plt.close()
+# RQ02 e RQ03: Pull Requests e Releases (Tabela de Estatísticas)
+print("Gerando tabela para RQ02 e RQ03 - Contribuições e Releases...")
+stats_df = df[['acceptedPullRequests', 'totalReleases']].describe().loc[['mean', '50%', '75%', 'max']]
+stats_df.rename(index={'50%': 'mediana', '75%': 'quartil_superior'}, inplace=True)
+stats_df.columns = ['Pull Requests Aceitas', 'Total de Releases']
+save_df_as_image(stats_df, 'RQ02 & RQ03: Estatísticas de Contribuições e Releases', os.path.join(OUTPUT_DIR, 'rq02_rq03_estatisticas_tabela.png'))
 
-# RQ03: Total de Releases (Box Plot)
-print("Gerando gráfico para RQ03 - Releases...")
-plt.figure(figsize=(10, 6))
-# Usando escala de log e removendo repositórios com 0 releases para a visualização
-sns.boxplot(x=df[df['totalReleases'] > 0]['totalReleases'])
-plt.xscale('log')
-plt.title('RQ03: Distribuição do Total de Releases (Repositórios com > 0 Releases)')
-plt.xlabel('Número Total de Releases (Escala Log)')
-plt.grid(True)
-plt.savefig('graficos/rq03_releases.png')
-plt.close()
-
-# RQ04: Dias Desde a Última Atualização (Histograma)
+# RQ04: Frequência de Atualizações (Gráfico de Pizza)
 print("Gerando gráfico para RQ04 - Atualização...")
-plt.figure(figsize=(10, 6))
-sns.histplot(df['daysSinceLastPush'], bins=30, kde=True)
-plt.title('RQ04: Frequência de Atualizações (Dias desde o último push)')
-plt.xlabel('Dias Desde a Última Atualização')
-plt.ylabel('Número de Repositórios')
-plt.xlim(0, df['daysSinceLastPush'].quantile(0.95)) # Foca nos 95% mais recentes
-plt.grid(True)
-plt.savefig('graficos/rq04_atualizacao.png')
+bins = [-1, 30, 90, 180, 365, df['daysSinceLastPush'].max()]
+labels = ['Menos de 1 mês', '1-3 meses', '3-6 meses', '6-12 meses', 'Mais de 1 ano']
+df['update_group'] = pd.cut(df['daysSinceLastPush'], bins=bins, labels=labels, right=True)
+update_dist = df['update_group'].value_counts()
+
+plt.figure(figsize=(10, 8))
+plt.pie(update_dist, labels=update_dist.index, autopct='%1.1f%%', startangle=90)
+plt.title('RQ04: Proporção por Tempo Desde a Última Atualização')
+plt.axis('equal')
+plt.savefig(os.path.join(OUTPUT_DIR, 'rq04_atualizacao_pizza.png'))
 plt.close()
 
-# RQ05: Linguagens de Programação
+
+# RQ05: Linguagens de Programação (Pizza e Tabela)
 print("Gerando gráficos para RQ05 - Linguagens...")
-# Contagem das linguagens
 language_counts = df['primaryLanguage'].value_counts()
-# Agrupa as linguagens menos comuns em "Outras"
 top_10_languages = language_counts.nlargest(10)
-others_count = language_counts.nsmallest(len(language_counts) - 10).sum()
-top_10_languages['Outras'] = others_count
+top_10_languages['Outras'] = language_counts.nsmallest(len(language_counts) - 10).sum()
 
 # Gráfico de Pizza
 plt.figure(figsize=(10, 8))
-plt.pie(top_10_languages, labels=top_10_languages.index, autopct='%1.1f%%', startangle=140, pctdistance=0.85)
-plt.title('RQ05: Distribuição das 10 Principais Linguagens de Programação')
+plt.pie(top_10_languages, labels=top_10_languages.index, autopct='%1.1f%%', startangle=140)
+plt.title('RQ05: Distribuição das 10 Principais Linguagens')
 plt.axis('equal')
-plt.savefig('graficos/rq05_linguagens.png')
+plt.savefig(os.path.join(OUTPUT_DIR, 'rq05_linguagens_pizza.png'))
 plt.close()
 
-# Gráfico de Barras
-plt.figure(figsize=(12, 7))
-sns.barplot(x=top_10_languages.index, y=top_10_languages.values)
-plt.title('RQ05: Contagem de Repositórios por Principal Linguagem de Programação')
-plt.xlabel('Linguagem')
-plt.ylabel('Número de Repositórios')
-plt.xticks(rotation=45, ha='right')
-plt.tight_layout()
-plt.savefig('graficos/rq05_linguagens_bar.png')
-plt.close()
+# Tabela
+lang_df = top_10_languages.reset_index()
+lang_df.columns = ['Linguagem', 'Nº de Repositórios']
+lang_df.set_index('Linguagem', inplace=True)
+save_df_as_image(lang_df, 'RQ05: Contagem de Repositórios por Linguagem', os.path.join(OUTPUT_DIR, 'rq05_linguagens_tabela.png'))
 
-# RQ06: Percentual de Issues Fechadas (Histograma)
+# RQ06: Percentual de Issues Fechadas (Gráfico de Pizza)
 print("Gerando gráfico para RQ06 - Issues Fechadas...")
-plt.figure(figsize=(10, 6))
-sns.histplot(df['closedIssuesPercentage'], bins=20, kde=False)
-plt.title('RQ06: Distribuição do Percentual de Issues Fechadas')
-plt.xlabel('Percentual de Issues Fechadas (%)')
-plt.ylabel('Número de Repositórios')
-plt.grid(True)
-plt.savefig('graficos/rq06_issues_fechadas.png')
+bins = [0, 80, 90, 95, 99, 100.1] # .1 para incluir o 100
+labels = ['< 80%', '80-90%', '90-95%', '95-99%', '99-100%']
+df['issues_group'] = pd.cut(df['closedIssuesPercentage'], bins=bins, labels=labels, right=False)
+issues_dist = df['issues_group'].value_counts()
+
+plt.figure(figsize=(10, 8))
+plt.pie(issues_dist, labels=issues_dist.index, autopct='%1.1f%%', startangle=90)
+plt.title('RQ06: Proporção por Faixa de Issues Fechadas')
+plt.axis('equal')
+plt.savefig(os.path.join(OUTPUT_DIR, 'rq06_issues_pizza.png'))
 plt.close()
 
-# RQ07: Comparação de Métricas por Linguagem
-print("Gerando gráficos para RQ07 - Comparação por Linguagem...")
-# Filtra o DataFrame para incluir apenas as top 10 linguagens (sem "Outras")
+# RQ07: Comparação de Métricas por Linguagem (Tabela)
+print("Gerando tabela para RQ07 - Comparação por Linguagem...")
 top_10_names = top_10_languages.drop('Outras').index
 df_top_lang = df[df['primaryLanguage'].isin(top_10_names)]
-
-# Agrupa por linguagem e calcula a mediana das métricas
 metrics_by_lang = df_top_lang.groupby('primaryLanguage').agg({
+    'stars': 'median',
     'repositoryAge': 'median',
     'acceptedPullRequests': 'median',
-    'totalReleases': 'median',
-    'closedIssuesPercentage': 'median',
-    'stars': 'median'
 }).rename(columns={
+    'stars': 'Estrelas (Mediana)',
     'repositoryAge': 'Idade Mediana (Anos)',
     'acceptedPullRequests': 'PRs Aceitas (Mediana)',
-    'totalReleases': 'Releases (Mediana)',
-    'closedIssuesPercentage': 'Issues Fechadas % (Mediana)',
-    'stars': 'Estrelas (Mediana)'
 }).sort_values(by='Estrelas (Mediana)', ascending=False)
+save_df_as_image(metrics_by_lang, 'RQ07: Métricas por Linguagem (Mediana)', os.path.join(OUTPUT_DIR, 'rq07_comparacao_tabela.png'))
 
-
-# Heatmap com as métricas normalizadas para melhor comparação de cores
-plt.figure(figsize=(12, 8))
-# Normaliza os dados (escala de 0 a 1) para o heatmap
-metrics_normalized = (metrics_by_lang - metrics_by_lang.min()) / (metrics_by_lang.max() - metrics_by_lang.min())
-sns.heatmap(metrics_normalized, annot=True, cmap='viridis', fmt=".2f")
-plt.title('RQ07: Métricas Normalizadas por Linguagem (Mediana)')
-plt.xlabel('Métricas')
-plt.ylabel('Linguagem de Programação')
-plt.xticks(rotation=30, ha='right')
-plt.tight_layout()
-plt.savefig('graficos/rq07_metricas_por_linguagem.png')
-plt.close()
-
-# Gráfico de Barras para Estrelas por Linguagem
-plt.figure(figsize=(12, 7))
-sns.barplot(x=metrics_by_lang.index, y=metrics_by_lang['Estrelas (Mediana)'], palette='viridis')
-plt.title('RQ07: Mediana de Estrelas por Linguagem')
-plt.xlabel('Linguagem')
-plt.ylabel('Mediana de Estrelas')
-plt.xticks(rotation=45, ha='right')
-plt.tight_layout()
-plt.savefig('graficos/rq07_comparacao_linguagens.png')
-plt.close()
-
-print("\nTodos os gráficos foram gerados e salvos na pasta 'graficos'!")
+print(f"\nTodos os gráficos foram gerados e salvos na pasta '{OUTPUT_DIR}'!")
