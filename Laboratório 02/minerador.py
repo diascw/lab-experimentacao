@@ -13,4 +13,25 @@ PARAMS = {
     'order': 'desc',
     'per_page': 100  
 }
+repos = []
+print("Buscando a primeira página...")
+
+try:
+    response = requests.get(API_URL, headers=HEADERS, params=PARAMS)
+    response.raise_for_status()  # Lança um erro para respostas HTTP > 400
+    
+    data = response.json()
+    
+    if 'items' in data:
+        for item in data['items']:
+            repos.append(item['full_name']) 
+    else:
+        print("Chave 'items' não encontrada na resposta.")
+
+except requests.exceptions.RequestException as e:
+    print(f"Erro ao fazer a requisição: {e}")
+    print(f"Resposta da API: {response.text}")
+
+print(f"Total de repositórios coletados na primeira página: {len(repos)}")
+print(repos)
 
