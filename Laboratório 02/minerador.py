@@ -34,4 +34,10 @@ except requests.exceptions.RequestException as e:
 
 print(f"Total de repositórios coletados na primeira página: {len(repos)}")
 print(repos)
+with open('lista_repositorios_java.csv', 'w', newline='', encoding='utf-8') as f:
+    writer = csv.writer(f)
+    writer.writerow(['repositorio']) 
+    for repo in repos:
+        writer.writerow([repo])
 
+print("Lista de repositórios salva em 'lista_repositorios_java.csv'")
