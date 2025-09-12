@@ -18,7 +18,7 @@ print("Buscando a primeira página...")
 
 try:
     response = requests.get(API_URL, headers=HEADERS, params=PARAMS)
-    response.raise_for_status()  # Lança um erro para respostas HTTP > 400
+    response.raise_for_status()  # lança um erro para respostas HTTP > 400
     
     data = response.json()
     
