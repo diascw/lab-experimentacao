@@ -1,9 +1,10 @@
-query TopJavaRepos($cursor: String) {
-  search(query: "language:Java sort:stars-desc", type: REPOSITORY, first: 25, after: $cursor) {
-    pageInfo {
-      hasNextPage
-      endCursor
-    }
+query ($cursor: String) {
+  search(
+    query: "language:java sort:stars-desc"
+    type: REPOSITORY
+    first: 25
+    after: $cursor
+  ) {
     edges {
       node {
         ... on Repository {
@@ -15,8 +16,15 @@ query TopJavaRepos($cursor: String) {
           stargazerCount
           createdAt
           pushedAt
+          releases {
+            totalCount
+          }
         }
       }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
     }
   }
 }

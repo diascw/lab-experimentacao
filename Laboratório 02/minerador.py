@@ -8,7 +8,6 @@ from requests.exceptions import HTTPError, RequestException
 
 # Config
 MAX_REPOS = 1000
-PAGE_SIZE = 25
 MAX_RETRIES = 4
 RETRY_BASE = 1.5
 
@@ -26,12 +25,11 @@ transport = RequestsHTTPTransport(
 )
 client = Client(transport=transport, fetch_schema_from_transport=False)
 
-# Ler a query do arquivo query.graphql
+# Ler a query
 QUERY_PATH = os.path.join(os.path.dirname(__file__), "query.graphql")
 with open(QUERY_PATH, "r", encoding="utf-8") as f:
     QUERY = f.read()
 
-# Busca uma página (25 itens) com retry
 def fetch_page(cursor=None):
     variables = {"cursor": cursor}
     attempt = 0
@@ -46,7 +44,6 @@ def fetch_page(cursor=None):
             print(f"Erro (tentativa {attempt}/{MAX_RETRIES}): {e}. Repetindo em {sleep_s:.1f}s…")
             time.sleep(sleep_s)
 
-# Paginação até juntar MAX_REPOS, tendo os repositórios Java ordenados por estrelas em ordem decrescente.
 def collect_top_repos():
     all_edges = []
     cursor = None
@@ -73,6 +70,7 @@ def save_to_csv(edges):
             "stars": repo["stargazerCount"],
             "createdAt": repo["createdAt"],
             "updatedAt": repo["pushedAt"],
+            "releases": repo["releases"]["totalCount"], 
         })
     df = pd.DataFrame(rows)
     df.to_csv("repositories.csv", index=False)
