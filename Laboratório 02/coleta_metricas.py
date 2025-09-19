@@ -1,151 +1,112 @@
-import os
-import csv
-import subprocess
 import pandas as pd
-import shutil
+import subprocess
+import os
+import shutil  # Módulo para remover a pasta do repositório de forma segura
+import stat    # Módulo necessário para alterar permissões de arquivos
+import time    # Módulo para adicionar um pequeno delay antes da limpeza
 
+# --- Configurações ---
+# Nome do arquivo CSV com a lista de repositórios
+REPOSITORIES_CSV = 'repositories.csv'
 
-CK_JAR_PATH = 'ck.jar' 
-REPO_LIST_FILE = 'lista_repositorios_java.csv'
-CLONE_DIR = 'cloned_repos'
-CK_RESULTS_DIR = 'ck_results'
-FINAL_RESULTS_FILE = 'metricas_sumarizadas.csv'
+# Caminho para o arquivo .jar da ferramenta CK
+CK_JAR_PATH = os.path.join('ck', 'target', 'ck-0.7.1-SNAPSHOT-jar-with-dependencies.jar')
 
+# Pasta onde os repositórios serão clonados temporariamente
+CLONE_DIR = 'temp_repo'
 
-def criar_diretorios():
-    """Cria os diretórios necessários para o script, se não existirem."""
-    print("Criando diretórios necessários...")
-    os.makedirs(CLONE_DIR, exist_ok=True)
-    os.makedirs(CK_RESULTS_DIR, exist_ok=True)
+# Pasta onde os resultados do CK serão salvos
+OUTPUT_DIR = 'resultados_ck'
 
-def ler_lista_repositorios():
-    """Lê o arquivo CSV com a lista de repositórios."""
+# --- Função de ajuda para a limpeza ---
+
+# Função para lidar com erros de permissão em arquivos somente leitura (comum no .git do Windows)
+def remove_readonly(func, path, excinfo):
+    """
+    Esta função de tratamento de erro é chamada por shutil.rmtree quando encontra um erro.
+    Ela remove o atributo 'somente leitura' do arquivo e tenta novamente a operação original.
+    """
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
+
+# --- Lógica Principal do Script ---
+
+def coletar_metricas():
+    # 1. Certifique-se de que o diretório de saída existe
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR)
+        print(f"Diretório '{OUTPUT_DIR}' criado.")
+
+    # 2. Ler o arquivo CSV com os repositórios
     try:
-        with open(REPO_LIST_FILE, 'r', encoding='utf-8') as f:
-            reader = csv.reader(f)
-            next(reader)  
-            repos = [row[0] for row in reader]
-            print(f"Encontrados {len(repos)} repositórios na lista.")
-            return repos
+        df = pd.read_csv(REPOSITORIES_CSV)
     except FileNotFoundError:
-        print(f"Erro: Arquivo '{REPO_LIST_FILE}' não encontrado.")
-        return []
-
-def clonar_repositorio(repo_full_name):
-    """Clona um repositório do GitHub, limpando o diretório antigo se existir."""
-    repo_name = repo_full_name.split('/')[-1]
-    repo_path = os.path.join(CLONE_DIR, repo_name)
-    
-    if os.path.exists(repo_path):
-        print(f"Repositório '{repo_full_name}' já existe. Removendo para garantir uma clonagem limpa...")
-        shutil.rmtree(repo_path)
-    
-    print(f"Clonando '{repo_full_name}' para '{repo_path}'...")
-    try:
-        subprocess.run(
-            ['git', 'clone', f'https://github.com/{repo_full_name}.git', repo_path, '--depth', '1'],
-            check=True, capture_output=True, text=True, encoding='utf-8', errors='ignore'
-        )
-        print("Clone concluído com sucesso.")
-        return repo_path
-    except subprocess.CalledProcessError as e:
-        print(f"### ERRO AO CLONAR O REPOSITÓRIO '{repo_full_name}'. ###")
-        print(f"Erro: {e.stderr}")
-        return None
-
-def executar_ck(repo_path):
-    """Executa a ferramenta CK com os parâmetros corretos e captura erros."""
-    repo_name = os.path.basename(repo_path)
-    output_path = os.path.join(CK_RESULTS_DIR, repo_name)
-    
-    if os.path.exists(output_path):
-        shutil.rmtree(output_path)
-    os.makedirs(output_path)
-    
-    print(f"\nExecutando o CK para o repositório '{repo_name}'...")
-    try:
-        command = [
-            'java', '-jar', CK_JAR_PATH,
-            repo_path,    
-            'false',        
-            '0',          
-            'false',       
-            output_path     
-        ]
-        
-        print(f"Comando executado: {' '.join(command)}")
-        
-        subprocess.run(
-            command,
-            check=True, capture_output=True, text=True, encoding='utf-8', errors='ignore'
-        )
-        
-        print(f"CK executado com sucesso. Resultados salvos em '{output_path}'.")
-        return output_path
-        
-    except subprocess.CalledProcessError as e:
-        print(f"### ERRO AO EXECUTAR O CK no repositório '{repo_name}'. ###")
-        print(f"--- Mensagem de erro do CK (stderr): ---\n{e.stderr}\n------------------------------------------")
-        return None
-    except FileNotFoundError:
-        print(f"### ERRO CRÍTICO ###")
-        print(f"Comando 'java' não foi encontrado ou o arquivo '{CK_JAR_PATH}' não existe nesta pasta.")
-        print("Verifique se o JDK está instalado e se o nome do arquivo .jar está correto na variável CK_JAR_PATH.")
-        return None
-
-def sumarizar_metricas(ck_output_path, repo_full_name):
-    """Lê os resultados do CK e calcula média, mediana e desvio padrão."""
-    class_metrics_file = os.path.join(ck_output_path, 'class.csv')
-    
-    if not os.path.exists(class_metrics_file):
-        print(f"\nERRO FINAL: Arquivo 'class.csv' não foi gerado em '{ck_output_path}'.")
-        print("Isso pode acontecer se o repositório não tiver código Java ou se o CK encontrou um erro fatal.")
-        return None
-
-    print("\nSumarizando métricas (CBO, DIT, LCOM)...")
-    try:
-        df = pd.read_csv(class_metrics_file)
-        
-        metricas = ['cbo', 'dit', 'lcom']
-        sumario = {'repositorio': repo_full_name}
-        
-        for metrica in metricas:
-            sumario[f'{metrica}_media'] = df[metrica].mean()
-            sumario[f'{metrica}_mediana'] = df[metrica].median()
-            sumario[f'{metrica}_desvio_padrao'] = df[metrica].std()
-                
-        return sumario
-    except Exception as e:
-        print(f"Erro ao processar o arquivo '{class_metrics_file}': {e}")
-        return None
-
-
-def main():
-    """Função principal que orquestra todo o processo."""
-    criar_diretorios()
-    repositorios = ler_lista_repositorios()
-    
-    if not repositorios:
+        print(f"Erro: Arquivo '{REPOSITORIES_CSV}' não encontrado! Execute o minerador.py primeiro.")
         return
 
-    primeiro_repo = repositorios[0]
+    # 3. Escolher um repositório para analisar (aqui, pegamos o primeiro da lista)
+    if df.empty:
+        print("Arquivo CSV está vazio. Nada para analisar.")
+        return
     
-    caminho_repo_clonado = clonar_repositorio(primeiro_repo)
+    # Pegamos as informações do primeiro repositório (índice 0)
+    repo_info = df.iloc[0]
+    repo_url = repo_info['url']
+    repo_name = repo_info['name']
     
-    if caminho_repo_clonado:
-        caminho_resultado_ck = executar_ck(caminho_repo_clonado)
-        
-        if caminho_resultado_ck:
-            dados_sumarizados = sumarizar_metricas(caminho_resultado_ck, primeiro_repo)
-            
-            if dados_sumarizados:
-                print(f"\nSalvando resultados sumarizados em '{FINAL_RESULTS_FILE}'...")
-                
-                df_final = pd.DataFrame([dados_sumarizados])
-                df_final.to_csv(FINAL_RESULTS_FILE, index=False, mode='w', header=True)
-                    
-                print(f"\nPROCESSO CONCLUÍDO COM SUCESSO!")
-                print(f"O resultado para '{primeiro_repo}' foi salvo em '{FINAL_RESULTS_FILE}'.")
+    print(f"Iniciando análise do repositório: {repo_name}")
 
-if __name__ == '__main__':
-    main()
+    # 4. Clonar o repositório
+    # Primeiro, removemos o diretório se ele já existir de uma execução anterior
+    if os.path.exists(CLONE_DIR):
+        print(f"Removendo diretório antigo '{CLONE_DIR}'...")
+        # Usamos o handler de erro caso a pasta antiga também tenha problemas de permissão
+        shutil.rmtree(CLONE_DIR, onerror=remove_readonly)
+
+    print(f"Clonando {repo_url} para a pasta '{CLONE_DIR}'...")
+    try:
+        # Usamos o subprocess para executar o comando 'git clone'
+        subprocess.run(['git', 'clone', repo_url, CLONE_DIR], check=True, capture_output=True, text=True)
+        print("Repositório clonado com sucesso! ")
+    except subprocess.CalledProcessError as e:
+        print(f"Erro ao clonar o repositório: {e.stderr}")
+        return
+
+    # 5. Executar a ferramenta CK para coletar as métricas
+    print("Executando a ferramenta CK para coletar as métricas...")
+    caminho_repo_clonado = os.path.abspath(CLONE_DIR)
+    caminho_saida_ck = os.path.abspath(OUTPUT_DIR)
+
+    try:
+        # Comando: java -jar ck.jar <caminho_do_repo> <use_jit> <max_files_per_commit> <output_dir>
+        comando_ck = [
+            'java', '-jar',
+            CK_JAR_PATH,
+            caminho_repo_clonado,
+            'true', # use_jit
+            '0',    # max_files (0 para ilimitado)
+            caminho_saida_ck
+        ]
+        
+        print(f"Comando CK: {' '.join(comando_ck)}")
+        subprocess.run(comando_ck, check=True, capture_output=True, text=True)
+        
+        print(f"Métricas coletadas com sucesso! Resultados salvos em '{OUTPUT_DIR}'.")
+        # O CK gera arquivos como 'class.csv', 'method.csv', etc. dentro do diretório de saída.
+
+    except FileNotFoundError:
+        print("Erro: 'java' não foi encontrado. Certifique-se de que o Java está instalado e no PATH do sistema.")
+    except subprocess.CalledProcessError as e:
+        print(f"Erro ao executar o CK: {e.stdout}{e.stderr}")
+    finally:
+        # 6. Limpar a pasta do repositório clonado
+        print(f"Limpando e removendo a pasta '{CLONE_DIR}'...")
+        # Adiciona um pequeno delay para garantir que nenhum processo (como antivírus) esteja usando os arquivos
+        time.sleep(1)
+        # Chama a remoção com a função de tratamento de erro para lidar com arquivos somente leitura
+        shutil.rmtree(CLONE_DIR, onerror=remove_readonly)
+        print("Limpeza concluída. ")
+
+
+if __name__ == "__main__":
+    coletar_metricas()
