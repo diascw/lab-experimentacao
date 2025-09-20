@@ -90,3 +90,13 @@ Os resultados obtidos através da análise visual refutaram a maioria das hipót
 A ausência generalizada de correlações lineares sugere que a qualidade de software, medida por CBO, DIT e LCOM, é um fenômeno complexo, provavelmente influenciado por fatores não medidos neste estudo, como a cultura da equipe de desenvolvimento e a rigidez dos processos de revisão de código.
 
 Em conclusão, este estudo empírico demonstrou que as características de processo de um projeto de software são preditores fracos de sua qualidade estrutural interna. A qualidade parece ser um atributo intrínseco, governado por fatores mais complexos do que seus metadados externos.
+
+## 5. Relação com o Artigo do arXiv
+
+Este estudo se conecta diretamente ao artigo [*Evolution Analysis of Software Quality Metrics in an Open-Source Java Project: A Case Study on TestNG*](https://arxiv.org/pdf/2505.22884).  
+
+- **Nosso relatório**: analisou **1.000 repositórios Java** do GitHub, buscando relações entre popularidade, maturidade, atividade e tamanho com métricas de qualidade (CBO, DIT, LCOM). Os resultados mostraram que esses fatores externos **não explicam bem a qualidade interna**.  
+
+- **O artigo**: focou na evolução do projeto **TestNG** ao longo de várias versões, observando que **refatorações e boas práticas de manutenção** reduziram complexidade e melhoraram a qualidade estrutural.  
+
+- **Complementaridade**: nossa pesquisa fornece uma visão **macro (transversal)** sobre muitos projetos, o artigo traz uma visão **micro (longitudinal)** de um caso específico. No entanto, ambos reforçam que a qualidade de software não depende apenas de popularidade ou tamanho, mas sim de **práticas internas conscientes de engenharia**.
