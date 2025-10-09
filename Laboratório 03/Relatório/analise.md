@@ -54,3 +54,111 @@ Justificativas:
 2. Spearman capta relações monotônicas (não necessariamente lineares).  
 
 ---
+
+## 3. Resultados
+
+### A. Feedback Final das Revisões (Status do PR)
+
+#### RQ01: Relação entre Tamanho e Status
+| Status  | Mediana de Linhas Alteradas | Mediana de Arquivos |
+|---------|------------------------------|----------------------|
+| MERGED  | 42                           | 2                    |
+| CLOSED  | 95                           | 5                    |
+
+*Análise:* PRs rejeitados são, em média, duas vezes maiores. Correlação negativa fraca (ρ ≈ -0.21, p < 0.001).
+
+---
+
+#### RQ02: Relação entre Tempo de Análise e Status
+| Status  | Mediana de Tempo de Análise (Horas) |
+|---------|--------------------------------------|
+| MERGED  | 31.5                                 |
+| CLOSED  | 102.0                                |
+
+*Análise:* PRs rejeitados demoram mais de 3x mais para serem analisados. Correlação negativa moderada (ρ ≈ -0.38, p < 0.001).
+
+---
+
+#### RQ03: Relação entre Descrição e Status
+| Status  | Mediana do Tamanho da Descrição (Caracteres) |
+|---------|----------------------------------------------|
+| MERGED  | 580                                          |
+| CLOSED  | 145                                          |
+
+*Análise:* PRs aceitos têm descrições muito mais detalhadas. Correlação positiva moderada (ρ ≈ +0.42, p < 0.001).
+
+---
+
+#### RQ04: Relação entre Interações e Status
+| Status  | Mediana de Comentários | Mediana de Participantes |
+|---------|-------------------------|--------------------------|
+| MERGED  | 6                       | 3                        |
+| CLOSED  | 14                      | 5                        |
+
+*Análise:* PRs rejeitados possuem mais comentários e participantes, indicando controvérsia.
+
+---
+
+### B. Número de Revisões
+
+#### RQ05: Relação entre Tamanho e Nº de Revisões
+* Correlação positiva moderada (ρ ≈ +0.48, p < 0.001).  
+* PRs maiores atraem mais revisões.
+
+---
+
+#### RQ06: Relação entre Tempo de Análise e Nº de Revisões
+* Correlação forte (ρ ≈ +0.65, p < 0.001).  
+* PRs abertos por mais tempo recebem mais revisões.
+
+---
+
+#### RQ07: Relação entre Descrição e Nº de Revisões
+* Correlação positiva fraca (ρ ≈ +0.15, p < 0.05).  
+* Descrições longas atraem mais revisões, refutando H7.
+
+---
+
+#### RQ08: Relação entre Interações e Nº de Revisões
+* Correlação muito forte (ρ ≈ +0.78, p < 0.001).  
+* Mais interações → mais revisões.
+
+---
+
+## 4. Discussão e Conclusão
+Os resultados confirmaram a maioria das hipóteses iniciais.  
+
+*Perfil de PR com maior chance de aceitação (MERGED):*
+* Tamanho pequeno a moderado (H1).  
+* Ciclo de vida rápido (H2).  
+* Descrição clara e detalhada (H3).  
+* Discussão focada, sem controvérsia excessiva (H4).  
+
+*Esforço de Revisão:*
+* PRs maiores (H5).  
+* PRs abertos por mais tempo (H6).  
+* PRs com mais discussões (H8).  
+* H7 refutada: descrições longas atraem mais revisões, possivelmente por engajarem revisores.  
+
+*Conclusão geral:*  
+Fatores de comunicação (descrição, tempo, nível de controvérsia) são mais relevantes do que o tamanho do código para prever o sucesso de um PR.  
+Recomendação: *contribuições pequenas e bem documentadas aumentam a chance de aceitação.*
+
+---
+
+## 5. Relação com Artigo Científico
+Este estudo dialoga com o artigo *"Work Practices and Challenges in Pull-Based Development"* (Gousios, Pinzger, Deursen).
+
+*Resumo do artigo:*  
+* Análise em larga escala de PRs e entrevistas com desenvolvedores.  
+* Conclusão: PR é um fenômeno *socio-técnico*.  
+* Fatores chave: clareza da descrição, velocidade do feedback, qualidade da discussão.  
+
+*Comparação com nosso relatório:*  
+* Correlação entre descrição detalhada e aceitação (RQ03) reforça as observações de Gousios et al.  
+* PRs longos em tempo de análise tendem a ser rejeitados (RQ02), alinhando-se à ênfase dos autores na rapidez do feedback.  
+
+*Complementaridade:*  
+* O artigo fornece visão ampla e qualitativa.  
+* Nosso estudo quantifica relações específicas.  
+* Ambos convergem: comunicação é tão ou mais importante que aspectos técnicos.
