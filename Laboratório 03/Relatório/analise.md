@@ -355,5 +355,6 @@ Este estudo dialoga com o artigo *"Work Practices and Challenges in Pull-Based D
 * O artigo fornece visão ampla e qualitativa.  
 * Nosso estudo quantifica relações específicas.  
 * Ambos convergem: comunicação é tão ou mais importante que aspectos técnicos.
->>>>>>> 826d256a33997473556852044305548f1099f09f
+
+
 
