@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Relatório Final: Análise da Atividade de Code Review em Repositórios Populares do GitHub
 
 ## 1. Introdução
@@ -357,3 +356,4 @@ Este estudo dialoga com o artigo *"Work Practices and Challenges in Pull-Based D
 * Nosso estudo quantifica relações específicas.  
 * Ambos convergem: comunicação é tão ou mais importante que aspectos técnicos.
 >>>>>>> 826d256a33997473556852044305548f1099f09f
+
