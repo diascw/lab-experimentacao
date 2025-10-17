@@ -88,7 +88,7 @@ Surpreendentemente, os dados refutaram a hipótese inicial (**H1**). PRs aceitos
 O número mediano de arquivos é o mesmo. Isso pode indicar que PRs muito pequenos e triviais (*CLOSED* com mediana de 6 linhas) são mais propensos a serem fechados por falta de relevância.
 
  **Gráfico RQ01 — Tamanho vs Status:**  
-![RQ01_tamanho_vs_status](./Laboratório%2003/graficos/RQ01_tamanho_vs_status.png)
+![RQ01_tamanho_vs_status](/Laboratório%2003/graficos/RQ01_tamanho_vs_status.png)
 
 ---
 
@@ -104,7 +104,7 @@ Conforme a hipótese (**H2**), o tempo de análise para PRs rejeitados é **quas
 Isso sugere que a **agilidade no processo de revisão** é um forte indicador de sucesso.
 
  **Gráfico RQ02 — Tempo vs Status:**  
-![RQ02_tempo_vs_status](./Laboratório%2003/graficos/RQ02_tempo_vs_status.png)
+![RQ02_tempo_vs_status](/Laboratório%2003/graficos/RQ02_tempo_vs_status.png)
 
 ---
 
@@ -120,7 +120,7 @@ Confirmando a hipótese (**H3**), PRs aceitos possuem **descrições mais longas
 A diferença não é extrema, mas reforça que uma **documentação mais completa** está associada a um resultado positivo.
 
  **Gráfico RQ03 — Descrição vs Status:**  
-![RQ03_descricao_vs_status](./Laboratório%2003/graficos/RQ03_descricao_vs_status.png)
+![RQ03_descricao_vs_status](/Laboratório%2003/graficos/RQ03_descricao_vs_status.png)
 
 ---
 
@@ -136,7 +136,7 @@ PRs rejeitados apresentam, na mediana, o **dobro de comentários**, confirmando 
 O número de participantes, no entanto, permanece o mesmo na mediana.
 
  **Gráfico RQ04 — Interações vs Status:**  
-![RQ04_interacoes_vs_status](./Laboratório%2003/graficos/RQ04_interacoes_vs_status.png)
+![RQ04_interacoes_vs_status](/Laboratório%2003/graficos/RQ04_interacoes_vs_status.png)
 
 ---
 
@@ -153,7 +153,7 @@ Todos os resultados foram **estatisticamente significantes (p < 0.05)**.
 | **RQ08 (Interações vs. Nº Revisões)** | 0.570 (comentários), 0.528 (participantes) | Correlação moderada a forte – confirma **H8** |
 
  **Gráfico RQ08 — Correlação Comentários vs Nº de Revisões:**  
-![RQ08_correlacao_comentarios_reacoes](./Laboratório%2003/graficos/RQ08_correlacao_comentarios_reacoes.png)
+![RQ08_correlacao_comentarios_reacoes](/Laboratório%2003/graficos/RQ08_correlacao_comentarios_revisoes.png)
 
 **Análise:**  
 Os resultados indicam que **PRs maiores, mais duradouros e com mais interações** tendem a receber **mais revisões**.  
@@ -355,6 +355,7 @@ Este estudo dialoga com o artigo *"Work Practices and Challenges in Pull-Based D
 * O artigo fornece visão ampla e qualitativa.  
 * Nosso estudo quantifica relações específicas.  
 * Ambos convergem: comunicação é tão ou mais importante que aspectos técnicos.
+
 
 
 
