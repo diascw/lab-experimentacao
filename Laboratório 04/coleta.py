@@ -1,124 +1,108 @@
-import sys
+import os
+import requests
+import pandas as pd
 import time
-import zipfile
-import urllib.request
-from urllib.error import HTTPError, URLError
-from pathlib import Path
+from dotenv import load_dotenv  
 
-URL = "https://download.inep.gov.br/microdados/microdados_enem_2024.zip"
-ZIP_NAME = "microdados_enem_2024.zip"
-EXTRACT_DIR = Path("microdados_enem_2024")
-CHUNK_SIZE = 1024 * 1024
-DELETE_ZIP_AFTER_EXTRACT = True
+load_dotenv() 
 
-def get_remote_size(url: str) -> int | None:
-    try:
-        req = urllib.request.Request(url, method="HEAD")
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            cl = resp.headers.get("Content-Length")
-            return int(cl) if cl is not None else None
-    except Exception:
-        return None
 
-def stream_download(url: str, dst: Path, resume: bool = True) -> None:
-    dst = Path(dst)
-    tmp = dst.with_suffix(".part")
-    remote_size = get_remote_size(url)
+GITHUB_TOKEN = os.getenv('GITHUB_TOKEN') 
+if not GITHUB_TOKEN:
+    raise EnvironmentError("Variável de ambiente GITHUB_TOKEN não configurada. Verifique seu arquivo .env")
 
-    already = tmp.stat().st_size if tmp.exists() else 0
-    headers = {}
-    mode = "wb"
-    if resume and remote_size and already > 0 and already < remote_size:
-        headers["Range"] = f"bytes={already}-"
-        mode = "ab"
-        print(f"Retomando download a partir de {already:,} bytes...")
-    elif dst.exists():
-        if remote_size and dst.stat().st_size == remote_size:
-            print("Arquivo já baixado. Pulando download.")
-            return
-        else:
-            dst.unlink(missing_ok=True)
-            tmp.unlink(missing_ok=True)
+HEADERS = {
+    'Authorization': f'token {GITHUB_TOKEN}',
+    'Accept': 'application/vnd.github.v3+json'
+}
 
-    req = urllib.request.Request(url, headers=headers)
-    try:
-        with urllib.request.urlopen(req, timeout=60) as resp, open(tmp, mode) as f:
-            status = getattr(resp, "status", None)
-            if status == 200 and mode == "ab":
-                f.close()
-                tmp.unlink(missing_ok=True)
-                print("Servidor não aceitou Range. Recomeçando do zero...")
-                req = urllib.request.Request(url)
-                with urllib.request.urlopen(req, timeout=60) as resp2, open(tmp, "wb") as f2:
-                    _download_loop(resp2, f2, remote_size)
+API_URL = 'https://api.github.com/search/repositories'
+
+
+TOPICOS_DE_BUSCA = {
+    'Awesome List': 'topic:awesome-list',
+    'Education': 'topic:education'
+}
+
+
+PAGINAS_POR_TOPICO = 10
+RESULTADOS_POR_PAGINA = 100
+
+dados_finais = []
+
+print("Iniciando a coleta de dados da API do GitHub...")
+
+
+for categoria, query in TOPICOS_DE_BUSCA.items():
+    
+    print(f"\nBuscando categoria: '{categoria}' (Query: '{query}')")
+    
+    for page_num in range(1, PAGINAS_POR_TOPICO + 1):
+        
+        params = {
+            'q': query,
+            'sort': 'stars',  
+            'order': 'desc',
+            'per_page': RESULTADOS_POR_PAGINA,
+            'page': page_num
+        }
+        
+        try:
+            response = requests.get(API_URL, headers=HEADERS, params=params)
+            
+            if response.status_code == 200:
+                data = response.json()
+                items = data.get('items', [])
+                
+                if not items:
+                    print(f"  Página {page_num}: Não encontrou mais resultados. Terminando este tópico.")
+                    break  
+                
+                print(f"  Página {page_num}: Coletando {len(items)} repositórios...")
+                
+                for repo in items:
+                    dados_repo = {
+                        'categoria': categoria,
+                        'nome_repo': repo.get('name'),
+                        'url': repo.get('html_url'),
+                        'stargazers_count': repo.get('stargazers_count'),
+                        'forks_count': repo.get('forks_count'),
+                        'open_issues_count': repo.get('open_issues_count'),
+                        'language': repo.get('language'),
+                        'license_name': repo.get('license', {}).get('name') if repo.get('license') else None,
+                        'created_at': repo.get('created_at'),
+                        'pushed_at': repo.get('pushed_at')
+                    }
+                    dados_finais.append(dados_repo)
+                
+               
+                time.sleep(2.5) 
+                
+            elif response.status_code == 403:
+                print(f"  Erro 403: Atingiu o Rate Limit da API. Aguardando 60 segundos...")
+                print(f"  Mensagem do GitHub: {response.json().get('message')}")
+                print(f"  Headers de limite: {response.headers.get('X-RateLimit-Remaining')} restantes.")
+                time.sleep(60)
             else:
-                _download_loop(resp, f, remote_size, initial_bytes=already)
-    except (HTTPError, URLError) as e:
-        print(f"Erro de download: {e}")
-        raise
+                print(f"  Erro ao buscar página {page_num}. Status: {response.status_code}")
+                print(f"  Mensagem: {response.text}")
+                break 
 
-    tmp.rename(dst)
-    print(f"Download concluído: {dst} ({dst.stat().st_size:,} bytes)")
-
-def _download_loop(resp, file_obj, total_size: int | None, initial_bytes: int = 0):
-    downloaded = initial_bytes
-    start = time.time()
-    while True:
-        chunk = resp.read(CHUNK_SIZE)
-        if not chunk:
+        except requests.exceptions.RequestException as e:
+            print(f"Ocorreu um erro de rede ou conexão: {e}")
+            print("Aguardando 30 segundos antes de tentar novamente...")
+            time.sleep(30)
+        except Exception as e:
+            print(f"Ocorreu um erro inesperado: {e}")
             break
-        file_obj.write(chunk)
-        downloaded += len(chunk)
-        _print_progress(downloaded, total_size, start)
 
-    print()
 
-def _print_progress(downloaded: int, total_size: int | None, start_time: float):
-    if total_size:
-        pct = downloaded / total_size * 100
-        elapsed = max(time.time() - start_time, 1e-6)
-        speed = downloaded / elapsed
-        sys.stdout.write(
-            f"\rBaixado: {downloaded:,}/{total_size:,} bytes ({pct:5.1f}%) | "
-            f"Velocidade: {speed/1_048_576:6.2f} MB/s"
-        )
-        sys.stdout.flush()
-    else:
-        sys.stdout.write(f"\rBaixado: {downloaded:,} bytes")
-        sys.stdout.flush()
-
-def validate_zip(zip_path: Path) -> None:
-    print("Validando ZIP...")
-    with zipfile.ZipFile(zip_path, "r") as zf:
-        bad = zf.testzip()
-        if bad is not None:
-            raise RuntimeError(f"Arquivo ZIP corrompido. Primeiro arquivo com erro: {bad}")
-    print("ZIP válido.")
-
-def unzip(zip_path: Path, extract_to: Path) -> None:
-    extract_to.mkdir(parents=True, exist_ok=True)
-    with zipfile.ZipFile(zip_path, "r") as zf:
-        zf.extractall(extract_to)
-    print(f"Extraído para: {extract_to.resolve()}")
-
-def main():
-    zip_path = Path(ZIP_NAME)
-
-    print(f"Baixando ENEM 2024 de:\n{URL}\n")
-    stream_download(URL, zip_path, resume=True)
-    validate_zip(zip_path)
-    unzip(zip_path, EXTRACT_DIR)
-
-    if DELETE_ZIP_AFTER_EXTRACT:
-        zip_path.unlink(missing_ok=True)
-        print("ZIP removido após extração.")
-
-if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        print("\nOperação cancelada pelo usuário.")
-        sys.exit(1)
-    except Exception as e:
-        print(f"\nFalha: {e}")
-        sys.exit(2)
+if dados_finais:
+    df = pd.DataFrame(dados_finais)
+    
+    nome_arquivo = 'github_dataset_alternativo.csv'
+    df.to_csv(nome_arquivo, index=False, encoding='utf-8')
+    
+    print(f"\nColeta concluída! {len(df)} registros salvos em '{nome_arquivo}'.")
+else:
+    print("\nColeta concluída, mas nenhum dado foi salvo.")
