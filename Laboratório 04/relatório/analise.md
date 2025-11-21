@@ -79,6 +79,24 @@ Comparando categorias:
 - **Awesome List:** maior presença de `None`  
 - **Education:** mais diversidade, com foco em linguagens de ensino (ex.: Python, JavaScript)
 
+![Tendência anual de repositórios por categoria (created_year vs repos_count, legenda por categoria)](../images/resumo_por_ano.png)
+
+Evolução do número de repositórios criados por ano em “Awesome List” e “Education”.
+
+
+![Atividade recente (% Ativo <=180d vs Inativo >180d por categoria)](../images/atividade_recente_por_categoria.png)
+
+Percentual de repositórios ativos nos últimos 180 dias por categoria.
+
+
+![Top 10 Linguagens por categoria (barras horizontais, legenda por categoria)](../images/linguagens_top_por_categoria.png)
+
+Linguagens mais prevalentes por categoria (Top 10).
+
+![Top 8 Licenças por categoria (barras empilhadas, legenda por categoria)](../images/licensas_top_por_categoria.png)
+
+Licenças mais utilizadas por categoria (Top 8).
+
 ---
 
 ## III. **Resultados**
