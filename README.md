@@ -1,6 +1,6 @@
 ## PUC Minas
 
-**Integrantes:** Gabriel |  Maria Eduarda Gonçalves | Wanessa Dias   
+**Integrantes:** Gabriel Tabatinga |  Maria Eduarda Gonçalves | Wanessa Dias   
 
 
 **Professor:**  Danilo Maia 
