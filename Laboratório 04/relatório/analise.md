@@ -1,4 +1,4 @@
-# 📝 Análise de Repositórios GitHub das Categorias "Awesome List" e "Education" Utilizando Business Intelligence
+# Análise de Repositórios GitHub das Categorias "Awesome List" e "Education" Utilizando Business Intelligence
 
 ## **Resumo**
 Este artigo descreve o uso de técnicas de Business Intelligence (BI) para coletar, organizar e analisar dados de repositórios do GitHub nas categorias "Awesome List" e "Education". Utilizando um conjunto de soluções de BI, um dashboard foi desenvolvido para converter um volume de dados brutos em informações relevantes. O trabalho visa caracterizar o dataset e responder a duas questões de pesquisa (RQs) relacionadas à popularidade, atividade e prevalência de tecnologias e licenças. Os resultados apresentados no dashboard fornecem suporte a decisões estratégicas e insights sobre o ecossistema de software livre nestas áreas temáticas.
