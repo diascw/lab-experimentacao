@@ -57,14 +57,10 @@ O dataset final é composto por **2000** repositórios, divididos entre as categ
 ### **Figura 1 — Caracterização do Dataset**
 
 #### **1. Distribuição Temporal (Figura 1a)**
-A análise da métrica *“Soma de repos_count por created_year”* mostra que a criação de repositórios na amostra **[Descrever o padrão: ex.: cresce após 2015, atinge pico em 2020, estabiliza ou reduz em 2023]**.
-
-Esse comportamento sugere **[interpretação: ex.: crescimento do interesse nesses tópicos, maior adoção do GitHub etc.]**.
+A análise da métrica “Soma de repos_count por created_year” mostra que a criação de repositórios na amostra cresce significativamente após 2012, atinge picos próximos a 2017 e 2020, e apresenta uma queda acentuada nos anos mais recentes (2023-2025). Esse comportamento sugere um forte crescimento no interesse e na criação de conteúdo nestes tópicos (Awesome List e Education) no meio da década passada, possivelmente indicando uma saturação ou a mudança de foco em anos mais recentes, ou ainda, que os repositórios mais novos não atingiram a popularidade necessária para serem incluídos na amostra (filtrada por estrelas).
 
 #### **2. Licenças (Figura 1b)**
-O gráfico “Soma de rank e Soma de count por license_name” indica que as licenças **[MIT, Creative Commons etc.]** são as mais comuns.
-
-Entradas sem licença definida (**None**) representam uma parcela significativa — o que pode limitar o reuso dos repositórios.
+O gráfico “Soma de rank e Soma de count por license_name” indica que as licenças MIT License, Creative Commons Attribution 4.0 International, GNU General Public License v3.0 e Apache License 2.0 são as mais comuns. Entradas sem licença definida (Desconhecida) representam uma parcela significativa — o que pode limitar o reuso dos repositórios.
 
 #### **3. Linguagens (Figura 1c)**
 A distribuição de linguagens revela predominância de:
@@ -76,7 +72,7 @@ A distribuição de linguagens revela predominância de:
 
 Comparando categorias:
 
-- **Awesome List:** maior presença de `None`  
+- **Awesome List:** maior presença de Desconhecida (provavelmente Markdown ou sem linguagem definida) 
 - **Education:** mais diversidade, com foco em linguagens de ensino (ex.: Python, JavaScript)
 
 ![Tendência anual de repositórios por categoria (created_year vs repos_count, legenda por categoria)](../images/resumo_por_ano.png)
