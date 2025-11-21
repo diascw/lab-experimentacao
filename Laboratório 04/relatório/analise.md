@@ -101,7 +101,7 @@ Os resultados são apresentados conforme as perguntas de pesquisa.
 
 ### III.I. **RQ1 – Popularidade e Atividade por Categoria**
 
-**(Figura 2 – Visualizações para a RQ1)**
+**![Atividade recente (% Ativo <=180d vs Inativo >180d por categoria)](../images/atividade_recente_por_categoria.png)**
 
 A comparação da **Mediana de stargazers_count por categoria** mostra que:
 
@@ -122,7 +122,7 @@ Sobre **open_issues_count (atividade)**:
 
 ### III.II. **RQ2 – Prevalência de Linguagens e Licenças**
 
-**(Figura 3 – Visualizações para a RQ2)**
+**![Top 10 Linguagens por categoria (barras horizontais, legenda por categoria)](../images/linguagens_top_por_categoria.png)**
 
 #### **Linguagens**
 - **Awesome List:** predomínio de `None`  
