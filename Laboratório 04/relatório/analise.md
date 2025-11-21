@@ -54,15 +54,27 @@ Os dados foram salvos em **github_dataset_alternativo.csv** e posteriormente imp
 ### II.II. **Caracterização do Dataset**
 O dataset final é composto por **2000** repositórios, divididos entre as categorias "Awesome List" e "Education". A caracterização da base é essencial para entender o escopo da análise (ver Figuras 1-3).
 
-### **Figura 1 — Caracterização do Dataset**
+### **Caracterização do Dataset**
 
-#### **1. Distribuição Temporal (Figura 1a)**
+![Tendência anual de repositórios por categoria (created_year vs repos_count, legenda por categoria)](../images/resumo_por_ano.png)
+
+Evolução do número de repositórios criados por ano em “Awesome List” e “Education”.
+
+#### **1. Distribuição Temporal**
 A análise da métrica “Soma de repos_count por created_year” mostra que a criação de repositórios na amostra cresce significativamente após 2012, atinge picos próximos a 2017 e 2020, e apresenta uma queda acentuada nos anos mais recentes (2023-2025). Esse comportamento sugere um forte crescimento no interesse e na criação de conteúdo nestes tópicos (Awesome List e Education) no meio da década passada, possivelmente indicando uma saturação ou a mudança de foco em anos mais recentes, ou ainda, que os repositórios mais novos não atingiram a popularidade necessária para serem incluídos na amostra (filtrada por estrelas).
 
-#### **2. Licenças (Figura 1b)**
+![Atividade recente (% Ativo <=180d vs Inativo >180d por categoria)](../images/atividade_recente_por_categoria.png)
+
+Percentual de repositórios ativos nos últimos 180 dias por categoria.
+
+#### **2. Licenças**
 O gráfico “Soma de rank e Soma de count por license_name” indica que as licenças MIT License, Creative Commons Attribution 4.0 International, GNU General Public License v3.0 e Apache License 2.0 são as mais comuns. Entradas sem licença definida (Desconhecida) representam uma parcela significativa — o que pode limitar o reuso dos repositórios.
 
-#### **3. Linguagens (Figura 1c)**
+![Top 10 Linguagens por categoria (barras horizontais, legenda por categoria)](../images/linguagens_top_por_categoria.png)
+
+Linguagens mais prevalentes por categoria (Top 10).
+
+#### **3. Linguagens**
 A distribuição de linguagens revela predominância de:
 
 - **Python**
@@ -74,20 +86,6 @@ Comparando categorias:
 
 - **Awesome List:** maior presença de Desconhecida (provavelmente Markdown ou sem linguagem definida) 
 - **Education:** mais diversidade, com foco em linguagens de ensino (ex.: Python, JavaScript)
-
-![Tendência anual de repositórios por categoria (created_year vs repos_count, legenda por categoria)](../images/resumo_por_ano.png)
-
-Evolução do número de repositórios criados por ano em “Awesome List” e “Education”.
-
-
-![Atividade recente (% Ativo <=180d vs Inativo >180d por categoria)](../images/atividade_recente_por_categoria.png)
-
-Percentual de repositórios ativos nos últimos 180 dias por categoria.
-
-
-![Top 10 Linguagens por categoria (barras horizontais, legenda por categoria)](../images/linguagens_top_por_categoria.png)
-
-Linguagens mais prevalentes por categoria (Top 10).
 
 ![Top 8 Licenças por categoria (barras empilhadas, legenda por categoria)](../images/licensas_top_por_categoria.png)
 
