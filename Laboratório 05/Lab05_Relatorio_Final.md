@@ -7,8 +7,6 @@ A linguagem de consulta GraphQL é uma alternativa às APIs REST tradicionais. E
 Para cada RQ, testamos as seguintes hipóteses (média populacional μ):
 - H0_time: μ_GraphQL ≥ μ_REST; H1_time: μ_GraphQL < μ_REST
 - H0_size: μ_GraphQL ≥ μ_REST; H1_size: μ_GraphQL < μ_REST
-- Linguagem: Python.
-- Dependências: Python 3.x; requests, pandas, matplotlib, seaborn.
 
 ## 2. Metodologia
 ### 2.1 Desenho Experimental
@@ -25,11 +23,9 @@ Para cada RQ, testamos as seguintes hipóteses (média populacional μ):
 - Warm-up: 1 requisição simples em cada API antes das medições para reduzir cold start.
 
 ### 2.2 Ambiente de Execução
-- Janela de coleta: 2025-12-05 01:07:50.631483+00:00 .. 2025-12-05 01:08:17.622777+00:00 (UTC)
-- SO/Plataforma: Linux-5.15.0-1062-aws-x86_64-with-glibc2.39
 - Python: 3.12.3
-- Bibliotecas: requests=2.32.3, pandas=2.2.3, matplotlib=3.9.2, seaborn=0.13.2 (SciPy opcional)
-- Parâmetros: timeout por requisição 20s; `sleep` entre requisições ≈ 0,1s; cabeçalhos com `Accept: application/json`.
+- Bibliotecas: requests=2.32.3, pandas=2.2.3, matplotlib=3.9.2, seaborn=0.13.2
+- Parâmetros: timeout por requisição 20s; `sleep` entre requisições ≈ 0,1s.
 
 ### 2.3 Critérios de Validade e Mitigações
 - Latência de rede: tratamentos intercalados e IDs embaralhados; ambos impactados por condições similares.
@@ -45,10 +41,10 @@ Para cada RQ, testamos as seguintes hipóteses (média populacional μ):
 ## 4. Resultados
 ### 4.1 Estatísticas Descritivas (respostas 200)
 
-| type    |   ('time_ms', 'count') |   ('time_ms', 'mean') |   ('time_ms', 'std') |   ('time_ms', 'median') |   ('size_bytes', 'count') |   ('size_bytes', 'mean') |   ('size_bytes', 'std') |   ('size_bytes', 'median') |
-|:--------|-----------------------:|----------------------:|---------------------:|------------------------:|--------------------------:|-------------------------:|------------------------:|---------------------------:|
-| GraphQL |                     50 |               300.458 |               35.772 |                 289.178 |                        50 |                    81.78 |                   6.149 |                       80.5 |
-| REST    |                     50 |               139.18  |              105.806 |                 172.152 |                        50 |                   688.42 |                 604.69  |                      479   |
+| type    |   N |   Tempo (ms) — média |   Tempo (ms) — mediana |   Tempo (ms) — desvio padrão |   Tamanho (bytes) — média |   Tamanho (bytes) — mediana |   Tamanho (bytes) — desvio padrão |
+|:--------|----:|---------------------:|-----------------------:|-----------------------------:|--------------------------:|----------------------------:|----------------------------------:|
+| GraphQL |  50 |              300.458 |                289.178 |                       35.772 |                     81.78 |                        80.5 |                             6.149 |
+| REST    |  50 |              139.18  |                172.152 |                      105.806 |                    688.42 |                       479   |                           604.69  |
 
 ### 4.2 Testes de Hipótese (unilaterais, GraphQL < REST)
 - Método: paired t-test (unilateral: GraphQL < REST)
