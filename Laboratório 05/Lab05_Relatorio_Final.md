@@ -7,7 +7,8 @@ A linguagem de consulta GraphQL é uma alternativa às APIs REST tradicionais. E
 Para cada RQ, testamos as seguintes hipóteses (média populacional μ):
 - H0_time: μ_GraphQL ≥ μ_REST; H1_time: μ_GraphQL < μ_REST
 - H0_size: μ_GraphQL ≥ μ_REST; H1_size: μ_GraphQL < μ_REST
-Dependências: Python 3.x; requests, pandas, matplotlib, seaborn.
+- Linguagem: Python.
+- Dependências: Python 3.x; requests, pandas, matplotlib, seaborn.
 
 ## 2. Metodologia
 ### 2.1 Desenho Experimental
