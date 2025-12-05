@@ -6,7 +6,7 @@ A linguagem de consulta GraphQL é uma alternativa às APIs REST tradicionais. E
 - RQ2. Respostas às consultas GraphQL têm tamanho menor que respostas às consultas REST?
 
 ## 2. Hipóteses (H0/H1)
-Seja \(\mu\) a média populacional. Definimos as hipóteses de forma unilateral (GraphQL < REST):
+Usamos "média(X)" para a média da métrica (tempo/tamanho) na API X:
 
 - RQ1. Respostas GraphQL são mais rápidas que respostas REST?
   - Hipótese nula:  
@@ -19,6 +19,8 @@ Seja \(\mu\) a média populacional. Definimos as hipóteses de forma unilateral 
     H0_tamanho: média(GraphQL) ≥ média(REST)
   - Hipótese alternativa:  
     H1_tamanho: média(GraphQL) < média(REST)
+
+  Nível de significância: α = 0,05.
 
 ## 3. Metodologia
 ### 3.1 Desenho Experimental
