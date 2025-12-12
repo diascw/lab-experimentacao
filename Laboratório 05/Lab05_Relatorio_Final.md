@@ -57,12 +57,12 @@ Usamos "média(X)" para a média da métrica (tempo/tamanho) na API X:
 
 | type    |   N |   Tempo (ms) — média |   Tempo (ms) — mediana |   Tempo (ms) — desvio padrão |   Tamanho (bytes) — média |   Tamanho (bytes) — mediana |   Tamanho (bytes) — desvio padrão |
 |:--------|----:|---------------------:|-----------------------:|-----------------------------:|--------------------------:|----------------------------:|----------------------------------:|
-| GraphQL |  50 |              300.458 |                289.178 |                       35.772 |                     81.78 |                        80.5 |                             6.149 |
-| REST    |  50 |              139.18  |                172.152 |                      105.806 |                    688.42 |                       479   |                           604.69  |
+| GraphQL |  50 |              401.56  |                326.12  |                      125.13  |                     81.78 |                        80.5 |                             6.149 |
+| REST    |  50 |              205.19  |                207.67  |                       98.13  |                    688.42 |                       479   |                           604.69  |
 
 ### 5.2 Testes de Hipótese (unilaterais, GraphQL < REST)
 - Método: paired t-test (unilateral: GraphQL < REST)
-- Diferença média de tempo (GraphQL − REST): 161.279 ms; p-valor = 1.00000
+- Diferença média de tempo (GraphQL − REST): +196,36 ms; p-valor = 1.00000
 - Diferença média de tamanho (GraphQL − REST): -606.6 bytes; p-valor = 0.00000
 Interpretação:
 - RQ1 (tempo): p ≈ 1.000 → não há evidência de que GraphQL seja mais rápido; nesta execução, GraphQL foi mais lento em média.
