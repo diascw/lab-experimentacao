@@ -6,7 +6,7 @@
 **Professor:**  Danilo Maia 
  
 
-**Disciplina:**  Laboratório de Experimentação de Software
+**Disciplina:**  Laboratório de Experimentação de Software, 6° período
   
 
 **Turno:**  Noite
